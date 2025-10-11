@@ -43,8 +43,8 @@ import { RsaComponent } from './rsa/rsa.component';
 import { MapsComponent } from './maps/maps.component';
 import { MiniblogComponent } from './miniblog/miniblog.component';
 
+
 const routes: Routes = [
-  
   {
     path: 'login',
     loadChildren: () => import('./login/login.module').then(m => m.LoginPageModule)

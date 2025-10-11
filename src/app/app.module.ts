@@ -49,6 +49,7 @@ import { MapsComponent } from './maps/maps.component';
 import { MiniblogComponent } from './miniblog/miniblog.component';
 import { AddBlogModalComponent } from './miniblog/add-blog-modal.component';
 
+
 // Фабрика для загрузчика переводов
 export function HttpLoaderFactory(http: HttpClient) {
   return new TranslateHttpLoader(http, './assets/i18s/', '.json');
