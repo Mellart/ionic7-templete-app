@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-task',
@@ -9,7 +10,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [IonicModule, FormsModule]
 })
-export class TaskComponent {
+export class TaskComponent implements OnInit {
   task = {
     id: 0,
     title: '',
@@ -20,13 +21,25 @@ export class TaskComponent {
     link: ''
   };
 
-  constructor(private modalController: ModalController) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      const taskId = params['id'];
+      if (taskId) {
+        this.task.id = parseInt(taskId);
+      }
+    });
+  }
 
   save() {
-    this.modalController.dismiss(this.task, 'save');
+    this.router.navigate(['/kanban']);
   }
 
   close() {
-    this.modalController.dismiss(null, 'cancel');
+    this.router.navigate(['/kanban']);
   }
 }

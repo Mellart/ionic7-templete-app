@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 
 interface Task {
+  id: number;
   text: string;
-  isEditing?: boolean; // Флаг для редактирования
+  isEditing?: boolean;
 }
 
 interface Column {
@@ -20,21 +22,35 @@ export class KanbanComponent {
   columns: Column[] = [
     {
       title: 'To Do',
-      tasks: [{ text: 'First Task' }, { text: 'Second Task' }],
+      tasks: [
+        { id: 1, text: 'First Task' },
+        { id: 2, text: 'Second Task' }
+      ],
     },
     {
       title: 'In Progress',
-      tasks: [{ text: 'Work on Kanban' }],
+      tasks: [
+        { id: 3, text: 'Work on Kanban' }
+      ],
     },
     {
       title: 'Done',
-      tasks: [{ text: 'Complete the project' }],
+      tasks: [
+        { id: 4, text: 'Complete the project' }
+      ],
     },
   ];
 
+  constructor(private router: Router) {}
+
+  // Открыть страницу редактирования задачи
+  openTaskModal(task: Task) {
+    this.router.navigate(['/task-edit'], { queryParams: { id: task.id } });
+  }
+
   // Начать редактирование задачи
   editTask(task: Task) {
-    this.stopEditing(); // Убедимся, что другая задача не редактируется
+    this.stopEditing();
     task.isEditing = true;
   }
 
@@ -43,7 +59,6 @@ export class KanbanComponent {
     if (task) {
       task.isEditing = false;
     } else {
-      // Убедимся, что все задачи выходят из режима редактирования
       this.columns.forEach((column) =>
         column.tasks.forEach((task) => (task.isEditing = false))
       );
@@ -52,19 +67,19 @@ export class KanbanComponent {
 
   // Добавление задачи
   addTask(column: Column) {
-    column.tasks.push({ text: 'New Task' });
+    const newId = Math.max(0, ...this.columns.flatMap(col => col.tasks.map(t => t.id))) + 1;
+    column.tasks.push({ id: newId, text: 'New Task' });
   }
 
   // Обработка перетаскивания
   onDragStart(event: any, task: Task) {
-    event.dataTransfer.setData('text', task.text); // Сохраняем текст задачи в переносимом объекте
+    event.dataTransfer.setData('text', task.text);
   }
 
   onDrop(event: any, column: Column) {
-    const taskText = event.dataTransfer.getData('text'); // Получаем текст задачи
+    const taskText = event.dataTransfer.getData('text');
     let task: Task | undefined = undefined;
 
-    // Находим задачу по тексту в столбцах
     this.columns.forEach((col) => {
       col.tasks.forEach((t) => {
         if (t.text === taskText) {
@@ -74,15 +89,14 @@ export class KanbanComponent {
     });
 
     if (task) {
-      // Удаляем задачу из текущей колонки и добавляем в новую
       this.columns.forEach((col) => {
         const index = col.tasks.indexOf(task!);
         if (index > -1) {
-          col.tasks.splice(index, 1); // Удаляем задачу из текущей колонки
+          col.tasks.splice(index, 1);
         }
       });
 
-      column.tasks.push(task); // Добавляем задачу в новую колонку
+      column.tasks.push(task);
     }
   }
 }

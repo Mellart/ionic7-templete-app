@@ -204,6 +204,9 @@ const routes: Routes = [
   { path: 'kanban_task',
     component: TaskComponent
   },
+  { path: 'task-edit',  // ДОБАВЬ ЭТОТ МАРШРУТ
+    component: TaskComponent
+  },
   {
     path: 'camera',
     loadChildren: () => import('./camera/camera-routing.module').then( m => m.CameraPageRoutingModule)

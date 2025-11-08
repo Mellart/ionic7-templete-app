@@ -10,12 +10,10 @@
       (dragover)="$event.preventDefault()">
       <h3>{{ column.title }}</h3>
 
-      <!-- Список задач в колонке -->
       <ion-card *ngFor="let task of column.tasks" class="kanban-task" draggable="true"
-        (dragstart)="onDragStart($event, task)" (dblclick)="editTask(task)">
+        (dragstart)="onDragStart($event, task)" (click)="openTaskModal(task)">
 
         <ion-card-content>
-          <!-- Условие для показа input или текста -->
           <div *ngIf="!task.isEditing" class="task-text">
             {{ task.text }}
           </div>
