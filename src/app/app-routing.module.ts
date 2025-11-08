@@ -35,6 +35,7 @@ import {ScilinkComponent} from "./scilink/scilink.component";
 import { CryptoRatesComponent } from './cryptorates/cryptorates.component'; 
 import {MplayerComponent} from "./mplayer/mplayer.component";
 import { KanbanComponent } from './kanban/kanban.component';
+import { TaskComponent } from './kanban/task/task.component';
 import { FileViewerComponent } from './file-viewer/file-viewer.component';
 import { DragAndDropComponent } from './drag-and-drop/drag-and-drop.component'
 import { WaterTrackerComponent } from './water-tracker/water-tracker.component';
@@ -199,6 +200,9 @@ const routes: Routes = [
   },
   { path: 'kanban',
     component: KanbanComponent
+  },
+  { path: 'kanban_task',
+    component: TaskComponent
   },
   {
     path: 'camera',

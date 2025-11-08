@@ -1,3 +1,59 @@
-<p>
-  task works!
-</p>
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="close()">Отмена</ion-button>
+    </ion-buttons>
+    <ion-title>Редактировать задачу</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="save()">Сохранить</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-item>
+    <ion-input
+      [(ngModel)]="task.title"
+      placeholder="Название задачи"
+    ></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-select [(ngModel)]="task.priority" placeholder="Приоритет">
+      <ion-select-option value="low">Низкий</ion-select-option>
+      <ion-select-option value="medium">Средний</ion-select-option>
+      <ion-select-option value="high">Высокий</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-select [(ngModel)]="task.status" placeholder="Статус">
+      <ion-select-option value="todo">To Do</ion-select-option>
+      <ion-select-option value="inprogress">In Progress</ion-select-option>
+      <ion-select-option value="done">Done</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-textarea
+      [(ngModel)]="task.description"
+      placeholder="Описание задачи..."
+      rows="5"
+    ></ion-textarea>
+  </ion-item>
+
+  <ion-item>
+    <ion-input
+      [(ngModel)]="task.timeEstimate"
+      type="number"
+      placeholder="Оценка времени (часы)"
+    ></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-input
+      [(ngModel)]="task.link"
+      placeholder="Ссылка"
+    ></ion-input>
+  </ion-item>
+</ion-content>
