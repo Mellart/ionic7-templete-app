@@ -5,19 +5,28 @@
     </ion-buttons>
     <ion-title>Редактировать задачу</ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="save()">Сохранить</ion-button>
+      <ion-button (click)="save()" [disabled]="!canSave()">Сохранить</ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-item>
+  <!-- Название задачи -->
+  <ion-item [color]="!isTitleValid ? 'danger' : ''">
     <ion-input
       [(ngModel)]="task.title"
-      placeholder="Название задачи">
+      (ionInput)="validateTitle()"
+      (ionBlur)="validateTitle()"
+      placeholder="Название задачи *"
+      required>
     </ion-input>
   </ion-item>
+  <!-- Сообщение об ошибке названия -->
+  <div *ngIf="!isTitleValid" class="error-message">
+    <ion-text color="danger">{{ titleErrorMessage }}</ion-text>
+  </div>
 
+  <!-- Приоритет -->
   <ion-item>
     <ion-select [(ngModel)]="task.priority" placeholder="Приоритет">
       <ion-select-option value="low">Низкий</ion-select-option>
@@ -26,6 +35,7 @@
     </ion-select>
   </ion-item>
 
+  <!-- Статус -->
   <ion-item>
     <ion-select [(ngModel)]="task.status" placeholder="Статус">
       <ion-select-option value="todo">To Do</ion-select-option>
@@ -34,6 +44,7 @@
     </ion-select>
   </ion-item>
 
+  <!-- Описание -->
   <ion-item>
     <ion-textarea
       [(ngModel)]="task.description"
@@ -42,6 +53,7 @@
     </ion-textarea>
   </ion-item>
 
+  <!-- Оценка времени -->
   <ion-item>
     <ion-input
       [(ngModel)]="task.timeEstimate"
@@ -50,10 +62,26 @@
     </ion-input>
   </ion-item>
 
-  <ion-item>
+  <!-- Ссылка -->
+  <ion-item [color]="!isLinkValid ? 'danger' : ''">
     <ion-input
       [(ngModel)]="task.link"
-      placeholder="Ссылка">
+      (ionInput)="validateLink()"
+      (ionBlur)="validateLink()"
+      placeholder="Ссылка (http://example.com или example.com)">
     </ion-input>
   </ion-item>
+  <!-- Сообщение об ошибке ссылки -->
+  <div *ngIf="!isLinkValid" class="error-message">
+    <ion-text color="danger">{{ linkErrorMessage }}</ion-text>
+  </div>
+
+  <!-- Подсказка по валидации -->
+  <ion-card class="hint-card">
+    <ion-card-content>
+      <ion-text color="medium">
+        <strong>Подсказка:</strong> Ссылка должна быть в формате https://example.com или example.com
+      </ion-text>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

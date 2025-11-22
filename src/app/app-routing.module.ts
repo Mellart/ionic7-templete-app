@@ -201,11 +201,8 @@ const routes: Routes = [
   { path: 'kanban',
     component: KanbanComponent
   },
-  { path: 'kanban_task',
-    component: TaskComponent
-  },
-  { path: 'task-edit',  // ДОБАВЬ ЭТОТ МАРШРУТ
-    component: TaskComponent
+  { path: 'task-edit',  // ВЕРНУТЬ обратно без :id
+  component: TaskComponent
   },
   {
     path: 'camera',

@@ -14,17 +14,9 @@
         (dragstart)="onDragStart($event, task)" (click)="openTaskModal(task)">
 
         <ion-card-content>
-          <div *ngIf="!task.isEditing" class="task-text">
+          <div class="task-text">
             {{ task.text }}
           </div>
-
-          <ion-item *ngIf="task.isEditing" class="edit-item">
-            <ion-input [(ngModel)]="task.text" 
-                      (blur)="stopEditing(task)" 
-                      (keyup.enter)="stopEditing(task)"
-                      type="text">
-            </ion-input>
-          </ion-item>
         </ion-card-content>
       </ion-card>
       

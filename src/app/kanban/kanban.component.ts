@@ -1,10 +1,16 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 interface Task {
   id: number;
   text: string;
-  isEditing?: boolean;
+  title?: string;
+  description?: string;
+  priority?: string;
+  status?: string;
+  timeEstimate?: number;
+  link?: string;
 }
 
 interface Column {
@@ -41,62 +47,141 @@ export class KanbanComponent {
     },
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router) {
+    this.loadData();
+    
+    // Слушаем события навигации чтобы обновить данные при возврате
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        if (event.url === '/kanban') {
+          console.log('=== DEBUG: Returned to kanban, reloading data ===');
+          this.loadData();
+        }
+      });
+  }
 
   // Открыть страницу редактирования задачи
   openTaskModal(task: Task) {
-    this.router.navigate(['/task-edit'], { queryParams: { id: task.id } });
+    this.router.navigate(['/task-edit'], {
+      queryParams: {
+        id: task.id,
+        text: task.text,
+        title: task.title || task.text,
+        description: task.description || '',
+        priority: task.priority || 'medium',
+        status: task.status || this.getStatusByColumn(task),
+        timeEstimate: task.timeEstimate || 0,
+        link: task.link || ''
+      }
+    });
   }
 
-  // Начать редактирование задачи
-  editTask(task: Task) {
-    this.stopEditing();
-    task.isEditing = true;
-  }
-
-  // Остановить редактирование задачи
-  stopEditing(task?: Task) {
-    if (task) {
-      task.isEditing = false;
-    } else {
-      this.columns.forEach((column) =>
-        column.tasks.forEach((task) => (task.isEditing = false))
-      );
+  // Получить статус по колонке
+  private getStatusByColumn(task: Task): string {
+    for (const column of this.columns) {
+      if (column.tasks.find(t => t.id === task.id)) {
+        switch (column.title) {
+          case 'To Do': return 'todo';
+          case 'In Progress': return 'inprogress';
+          case 'Done': return 'done';
+          default: return 'todo';
+        }
+      }
     }
+    return 'todo';
   }
 
   // Добавление задачи
   addTask(column: Column) {
-    const newId = Math.max(0, ...this.columns.flatMap(col => col.tasks.map(t => t.id))) + 1;
-    column.tasks.push({ id: newId, text: 'New Task' });
+    let maxId = 0;
+    this.columns.forEach(col => {
+      col.tasks.forEach(task => {
+        if (task.id > maxId) {
+          maxId = task.id;
+        }
+      });
+    });
+    
+    const newId = maxId + 1;
+    const status = this.getStatusByColumnTitle(column.title);
+    const newTask: Task = {
+      id: newId,
+      text: 'New Task',
+      title: 'New Task',
+      status: status
+    };
+    column.tasks.push(newTask);
+    this.saveData();
+  }
+
+  private getStatusByColumnTitle(columnTitle: string): string {
+    switch (columnTitle) {
+      case 'To Do': return 'todo';
+      case 'In Progress': return 'inprogress';
+      case 'Done': return 'done';
+      default: return 'todo';
+    }
   }
 
   // Обработка перетаскивания
   onDragStart(event: any, task: Task) {
-    event.dataTransfer.setData('text', task.text);
+    event.dataTransfer.setData('text/plain', task.id.toString());
   }
 
   onDrop(event: any, column: Column) {
-    const taskText = event.dataTransfer.getData('text');
+    event.preventDefault();
+    const taskId = parseInt(event.dataTransfer.getData('text/plain'));
     let task: Task | undefined = undefined;
+    let sourceColumn: Column | undefined = undefined;
 
-    this.columns.forEach((col) => {
-      col.tasks.forEach((t) => {
-        if (t.text === taskText) {
-          task = t;
-        }
-      });
-    });
-
-    if (task) {
-      this.columns.forEach((col) => {
-        const index = col.tasks.indexOf(task!);
-        if (index > -1) {
-          col.tasks.splice(index, 1);
-        }
-      });
-
-      column.tasks.push(task);
+    for (const col of this.columns) {
+      const foundTask = col.tasks.find(t => t.id === taskId);
+      if (foundTask) {
+        task = foundTask;
+        sourceColumn = col;
+        break;
+      }
     }
+
+    if (task && sourceColumn) {
+      const index = sourceColumn.tasks.indexOf(task);
+      if (index > -1) {
+        sourceColumn.tasks.splice(index, 1);
+      }
+
+      // Обновляем статус при перемещении
+      task.status = this.getStatusByColumnTitle(column.title);
+      column.tasks.push(task);
+      this.saveData();
+    }
+  }
+
+  // Сохранение данных в localStorage
+  saveData() {
+    try {
+      localStorage.setItem('kanbanData', JSON.stringify(this.columns));
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  }
+
+  // Загрузка данных из localStorage
+  loadData() {
+    try {
+      const savedData = localStorage.getItem('kanbanData');
+      if (savedData) {
+        const parsedData = JSON.parse(savedData);
+        if (parsedData && parsedData.length > 0) {
+          this.columns = parsedData;
+        }
+      }
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
+  }
+
+  ngOnInit() {
+    this.loadData();
   }
 }
